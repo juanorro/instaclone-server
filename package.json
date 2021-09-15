@@ -1,0 +1,23 @@
+{
+  "name": "instaclone",
+  "version": "0.0.1",
+  "description": "server of the app instaclone",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon node ./app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Juanorro Rodríguez",
+  "license": "ISC",
+  "dependencies": {
+    "apollo-server": "^3.3.0",
+    "apollo-server-core": "^3.3.0",
+    "aws-sdk": "^2.988.0",
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^10.0.0",
+    "graphql": "^15.5.3",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^6.0.5",
+    "nodemon": "^2.0.12"
+  }
+}
