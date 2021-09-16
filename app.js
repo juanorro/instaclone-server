@@ -3,6 +3,7 @@ const { ApolloServerPluginLandingPageGraphQLPlayground } = require('apollo-serve
 const typeDefs = require('./gql/schema');
 const resolvers = require('./gql/resolver');
 const mongoConnection = require('./config/db.config');
+const jwt = require('jsonwebtoken');
 require('dotenv').config({ path: '.env' });
 
 //ddbb
@@ -12,6 +13,26 @@ mongoConnection();
 const server = new ApolloServer({
         typeDefs,
         resolvers,
+        context: ({ req }) => {
+            const token = req.headers.authorization;
+
+            if(token) {
+                try {
+                    const user = jwt.verify(
+                        token.replace('Bearer ', ''),
+                        process.env.SECRET_KEY
+                    );
+
+                    return {
+                        user,
+                    }
+                } catch (error) {
+                    console.log('### ERROR ###');
+                    console.log(error);
+                    throw new Error('token invalid')
+                }
+            }
+        },
         plugins: [
             ApolloServerPluginLandingPageGraphQLPlayground(),
           ]

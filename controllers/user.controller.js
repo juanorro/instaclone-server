@@ -68,9 +68,48 @@ const updateAvatar = async(file) => {
     return null;
 }
 
+const updateUser = async(input, ctx) => {
+    
+    const { id } = ctx.user;
+    const { currentPassword, newPassword } = input;
+
+    try {
+
+        if(currentPassword && newPassword) {
+
+            //cambiar contraseña
+            const userFound = await User.findById(id);
+
+            const passwordSucess = await bcrypt.compare(
+                currentPassword,
+                userFound.password
+            );
+
+            if(!passwordSucess) {
+                throw new Error('Contraseña incorrecta');
+            }
+
+            const salt = await bcrypt.genSaltSync(10);
+            const newPasswordCrypt = await bcrypt.hash(newPassword, salt);
+
+            await User.findByIdAndUpdate(id, { password: newPasswordCrypt });
+            
+        } else {
+            await User.findByIdAndUpdate(id, input);
+        }
+
+        return true;
+
+    } catch (error) {
+        console.log(error);
+        return false;
+    }
+}
+
 module.exports = {
     register,
     login,
     getUser,
     updateAvatar,
+    updateUser,
 } 
