@@ -106,10 +106,25 @@ const updateUser = async(input, ctx) => {
     }
 }
 
+const search = async(search) => {
+    const users = await User.find({
+
+        //con esta opción hay que escribir las cosas exactas
+        // name: search
+
+        //con esta opción te trae las cosas por las que empieza
+
+        name: { $regex: search, $options: 'i' }
+    })
+
+    return users;
+}
+
 module.exports = {
     register,
     login,
     getUser,
     updateAvatar,
     updateUser,
+    search
 } 

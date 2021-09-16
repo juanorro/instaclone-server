@@ -48,6 +48,12 @@ const typeDefs = gql`
     type Query {
         # user
         getUser(id: ID, username: String): User
+        search(search: String): [User]
+
+        #follow
+        isFollow(username: String!): Boolean
+        getFollowers(username: String!): [User]
+        getFollows(username: String!): [User]
     }
 
     type Mutation {
@@ -56,6 +62,10 @@ const typeDefs = gql`
         login(input: LoginInput): Token
         updateAvatar(file: Upload!): UpdateAvatar
         updateUser(input: UserUpdateInput): Boolean
+
+        #follow
+        follow(username: String!): Boolean
+        unFollow(username: String!): Boolean
     }
 `;
 
