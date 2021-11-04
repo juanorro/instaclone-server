@@ -1,16 +1,33 @@
-const { ApolloServer } = require('apollo-server');
+const { ApolloServer } = require('apollo-server-express');
+const express = require("express");
+const mongoose = require('mongoose');
+const { graphqlUploadExpress } = require("graphql-upload");
 const { ApolloServerPluginLandingPageGraphQLPlayground } = require('apollo-server-core');
 const typeDefs = require('./gql/schema');
 const resolvers = require('./gql/resolver');
-const mongoConnection = require('./config/db.config');
 const jwt = require('jsonwebtoken');
+const cors = require('./config/cors.config');
 require('dotenv').config({ path: '.env' });
 
 //ddbb
 
-mongoConnection();
+mongoose.connect('mongodb://localhost/instaclone', {
+    useNewUrlParser: true, 
+    useUnifiedTopology: true 
+}, 
+(err, _) => {
+    if(err) {
+        console.log('Connection Failed')
+    } else {
+        server();
+    }
+}
 
-const server = new ApolloServer({
+)
+
+const server = async() => {
+    
+    const apolloServer = new ApolloServer({
         typeDefs,
         resolvers,
         context: ({ req }) => {
@@ -33,11 +50,19 @@ const server = new ApolloServer({
                 }
             }
         },
+        introspection: true,
         plugins: [
             ApolloServerPluginLandingPageGraphQLPlayground(),
           ]
-});
+    });
 
-server.listen().then(({ url }) => {
-    console.log(`Server in url ${ url }`)
-});
+    await apolloServer.start()
+    const app = express();
+    app.use(graphqlUploadExpress());
+    app.use(cors);
+    apolloServer.applyMiddleware({ app });
+
+    await new Promise((r) => app.listen({ port: 4000}, r));
+
+    console.log(`Server ready at http://localhost:4000${apolloServer.graphqlPath}`)
+};

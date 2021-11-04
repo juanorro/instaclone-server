@@ -1,6 +1,7 @@
 const User = require('../models/user.models');
 const bcrypt = require('bcryptjs');
 const { createToken } = require('../helpers/jwt.helper');
+const awsUploadImage = require('../config/aws.upload.config');
 
 const register = async (input) => {
     const { username, email, password } = input;
@@ -63,10 +64,39 @@ const getUser = async(id, username) => {
     }
 }
 
-const updateAvatar = async(file) => {
-    console.log('este es el fichero en el server => ', file);
-    return null;
-}
+const updateAvatar = async(file, ctx) => {
+    const { id } = ctx.user;
+    const { mimetype, createReadStream } = await file;
+    const extension = mimetype.split('/')[1];
+    const imagePath = `avatar/${id}.${extension}`
+    const fileData = createReadStream();
+
+    try {
+        const result = await awsUploadImage(fileData, imagePath);
+        await User.findByIdAndUpdate(id, { avatar: result });
+        return {
+            status: true, 
+            urlAvatar: result
+        }
+    } catch (error) {
+        return {
+            status: false,
+            urlAvatar: null
+        }
+    }
+};
+
+const deleteAvatar = async(ctx) => {
+    const { id } = ctx.user;
+
+    try {
+        await User.findByIdAndUpdate(id, { avatar: '' });
+        return true;
+    } catch (error) {
+        console.log(error);
+        return false;
+    };
+};
 
 const updateUser = async(input, ctx) => {
     
@@ -125,6 +155,7 @@ module.exports = {
     login,
     getUser,
     updateAvatar,
+    deleteAvatar,
     updateUser,
     search
 } 

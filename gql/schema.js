@@ -1,4 +1,4 @@
-const { gql } = require('apollo-server');
+const { gql } = require('apollo-server-express');
 
 const typeDefs = gql`
     type User {
@@ -24,6 +24,26 @@ const typeDefs = gql`
         urlAvatar: String
     }
 
+    type Publish {
+        status: Boolean
+        urlFile: String
+    }
+
+    type Publication {
+        id: ID
+        idUser: ID
+        file: String
+        typeFile: String
+        createAt: String
+    }
+
+    type Comment {
+        idPublication: ID
+        idUser: ID
+        comment: String
+        createAt: String
+    }
+
     input UserInput {
         name: String!
         username: String!
@@ -45,6 +65,11 @@ const typeDefs = gql`
         description: String
     }
 
+    input CommentInput {
+        idPublication: ID
+        comment: String
+    }
+
     type Query {
         # user
         getUser(id: ID, username: String): User
@@ -54,18 +79,28 @@ const typeDefs = gql`
         isFollow(username: String!): Boolean
         getFollowers(username: String!): [User]
         getFollows(username: String!): [User]
+
+        #publication
+        getAllPublications(username: String!): [Publication]
     }
 
     type Mutation {
         #user
         register(input: UserInput): User
         login(input: LoginInput): Token
-        updateAvatar(file: Upload!): UpdateAvatar
+        updateAvatar(file: Upload): UpdateAvatar
+        deleteAvatar: Boolean
         updateUser(input: UserUpdateInput): Boolean
 
         #follow
         follow(username: String!): Boolean
         unFollow(username: String!): Boolean
+
+        #publication
+        publish(file: Upload): Publish
+
+        #comment
+        addComment(input: CommentInput): Comment
     }
 `;
 
