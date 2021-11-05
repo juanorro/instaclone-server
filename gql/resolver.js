@@ -3,6 +3,7 @@ const followController = require('../controllers/follow.controller');
 const { GraphQLUpload } = require("graphql-upload");
 const publicationController = require('../controllers/publication.controller');
 const commentController = require('../controllers/comment.controller');
+const likeController = require('../controllers/like.controller');
 
 const resolvers = {
     Upload: GraphQLUpload,
@@ -18,6 +19,13 @@ const resolvers = {
 
         //publication
         getAllPublications: (_, { username }) => publicationController.getAllPublications(username),
+
+        //comment
+        getComments: (_, { idPublication }) => commentController.getComments(idPublication),
+
+        //like
+        isLike: (_, { idPublication }, ctx) => likeController.isLike(idPublication, ctx),
+        countLikes: (_, { idPublication }) => likeController.countLikes(idPublication),
     }, 
  
     Mutation: {
@@ -36,7 +44,11 @@ const resolvers = {
         publish: (_, { file }, ctx) => publicationController.publish(file, ctx),
 
         //comment
-        addComment: (_, { input }, ctx) => commentController.addComment(input, ctx)
+        addComment: (_, { input }, ctx) => commentController.addComment(input, ctx),
+
+        //like
+        addLike: (_, {idPublication}, ctx) => likeController.addLike(idPublication, ctx),
+        deleteLike: (_, { idPublication }, ctx) => likeController.deleteLike(idPublication, ctx),
     }
 };
 

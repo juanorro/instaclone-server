@@ -39,7 +39,7 @@ const typeDefs = gql`
 
     type Comment {
         idPublication: ID
-        idUser: ID
+        idUser: User
         comment: String
         createAt: String
     }
@@ -82,6 +82,13 @@ const typeDefs = gql`
 
         #publication
         getAllPublications(username: String!): [Publication]
+
+        #comment
+        getComments(idPublication: ID!): [Comment]
+
+        #like
+        isLike(idPublication: ID!): Boolean
+        countLikes(idPublication: ID!): Int
     }
 
     type Mutation {
@@ -101,6 +108,10 @@ const typeDefs = gql`
 
         #comment
         addComment(input: CommentInput): Comment
+
+        #like
+        addLike(idPublication: ID!): Boolean
+        deleteLike(idPublication: ID!): Boolean
     }
 `;
 
