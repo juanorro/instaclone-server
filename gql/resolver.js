@@ -16,9 +16,11 @@ const resolvers = {
         isFollow: (_, { username }, ctx) => followController.isFollow(username, ctx),
         getFollowers: (_, { username }) => followController.getFollowers(username),
         getFollows: (_, { username }) => followController.getFollows(username),
+        getNotFollowers: (_, {}, ctx) => followController.getNotFollowers(ctx),
 
         //publication
         getAllPublications: (_, { username }) => publicationController.getAllPublications(username),
+        getPublicationsFollowers: (_, {}, ctx) => publicationController.getPublicationsFollowers(ctx),
 
         //comment
         getComments: (_, { idPublication }) => commentController.getComments(idPublication),

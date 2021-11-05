@@ -88,6 +88,26 @@ const getFollows = async(username) => {
         followsList.push(data.follow);
     }
     return followsList;
+};
+
+const getNotFollowers = async(ctx) => {
+    const users = await User.find().limit(50);
+
+    const arrayUsers = [];
+
+    for await(const user of users) {
+        const isFind = await Follow.findOne({ idUser: ctx.user.id })
+            .where('follow')
+            .equals(user._id);
+
+        if(!isFind) {
+            if(user._id.toString() !== ctx.user.id.toString()) {
+                arrayUsers.push(user);
+            }
+        }
+    }
+
+    return arrayUsers;
 }
 
 module.exports = {
@@ -96,4 +116,5 @@ module.exports = {
     unFollow, 
     getFollowers,
     getFollows,
+    getNotFollowers,
 }

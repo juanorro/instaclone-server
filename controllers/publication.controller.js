@@ -1,5 +1,6 @@
 const Publication = require('../models/publication.models');
 const User = require('../models/user.models');
+const Follow = require('../models/follow.models');
 const awsUploadImage = require('../config/aws.upload.config');
 const {v4: uuidv4} = require('uuid');
 
@@ -42,9 +43,36 @@ const getAllPublications = async(username) => {
         .sort({ createAt: -1 });
 
     return publications
-}
+};
+
+const getPublicationsFollowers = async(ctx) => {
+    const followers = await Follow.find({ idUser: ctx.user.id }).populate('follow');
+
+    const followersList = [];
+    for await (const data of followers) {
+        followersList.push(data.follow)
+    }
+
+    const publicationsList = [];
+
+    for await (const data of followersList) {
+        const publications = await Publication.find()
+            .where({ idUser: data._id })
+            .sort({ createAt: -1})
+            .populate('idUser')
+
+            publicationsList.push(...publications);
+    }
+
+    const result = publicationsList.sort((a, b) => {
+        return new Date(b.createAt) - new Date(a.createAt)
+    });
+
+    return result;
+};
 
 module.exports = {
     publish,
     getAllPublications,
+    getPublicationsFollowers
 }
